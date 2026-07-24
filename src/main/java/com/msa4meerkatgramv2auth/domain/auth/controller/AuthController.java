@@ -1,6 +1,7 @@
 package com.msa4meerkatgramv2auth.domain.auth.controller;
 
 import com.msa4meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
+import com.msa4meerkatgramv2auth.domain.auth.request.RegistrationRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.auth.service.AuthService;
 import com.msa4meerkatgramv2auth.global.config.openapi.CustomApiResponse;
@@ -79,5 +80,20 @@ public class AuthController {
         HttpServletResponse response
     ) {
         return ResponseEntity.ok(GlobalResponseDTO.success(authService.reissue(request, response)));
+    }
+
+    @Operation(summary = "회원가입 처리")
+    @SecurityRequirements
+    @CustomApiResponse(value = {
+        CustomResponseCode.INVALID_PARAMETER_ERROR,
+        CustomResponseCode.DB_ERROR,
+        CustomResponseCode.SYSTEM_ERROR
+    })
+    @PostMapping("/registration")
+    public ResponseEntity<GlobalResponseDTO<Void>> auth(
+        @Valid @RequestBody RegistrationRequestDTO registrationRequestDTO
+    ) {
+        authService.registration(registrationRequestDTO);
+        return ResponseEntity.ok(GlobalResponseDTO.success());
     }
 }

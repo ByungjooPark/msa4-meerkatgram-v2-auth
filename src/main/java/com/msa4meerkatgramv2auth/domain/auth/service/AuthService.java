@@ -2,6 +2,7 @@ package com.msa4meerkatgramv2auth.domain.auth.service;
 
 import com.msa4meerkatgramv2auth.domain.auth.repository.AuthRepository;
 import com.msa4meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
+import com.msa4meerkatgramv2auth.domain.auth.request.RegistrationRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.user.entity.User;
 import com.msa4meerkatgramv2auth.global.cookie.CookieManager;
@@ -90,5 +91,15 @@ public class AuthService {
 
         // Cookie에 저장한 리프래시토큰 파기
         cookieManager.removeRefreshTokenToCookie(response);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void registration(RegistrationRequestDTO registrationRequestDTO) {
+        User user = new User();
+        user.setEmail(registrationRequestDTO.email());
+        user.setPassword(passwordEncoder.encode(registrationRequestDTO.password()));
+        user.setNick(registrationRequestDTO.nick());
+        user.setProfile(registrationRequestDTO.profile());
+        authRepository.save(user);
     }
 }

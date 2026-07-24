@@ -1,5 +1,6 @@
 package com.msa4meerkatgramv2auth.global.config.openapi;
 
+import com.msa4meerkatgramv2auth.global.jwt.JwtConfig;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -11,9 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
     private static final String BEARER_AUTH = "bearerAuth";
+    private static final String COOKIE_REFRESH_TOKEN = "cookieRefreshToken";
 
     @Bean
-    public OpenAPI customOpenAPI() {
+    public OpenAPI customOpenAPI(JwtConfig jwtConfig) {
         return new OpenAPI()
             .info(
               new Info()
@@ -21,11 +23,22 @@ public class OpenApiConfig {
                   .description("Meerkatgram Auth REST API Document") // 문서 설명
                   .version("v1.0.0") // 문서 버전
             )
-            .components(new Components().addSecuritySchemes(BEARER_AUTH,
-                new SecurityScheme()
-                    .type(SecurityScheme.Type.HTTP)
-                    .scheme("bearer")
-                    .bearerFormat("JWT")))
+            .components(new Components()
+                .addSecuritySchemes(
+                    BEARER_AUTH,
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                )
+                .addSecuritySchemes(
+                    COOKIE_REFRESH_TOKEN,
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.COOKIE)
+                        .name(jwtConfig.refreshTokenCookieName())
+                )
+            )
             .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
     }
 }

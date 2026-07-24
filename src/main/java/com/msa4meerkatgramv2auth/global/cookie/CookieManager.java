@@ -26,6 +26,25 @@ public class CookieManager {
     }
 
     /**
+     * 쿠키에서 리프래시 토큰 제거
+     * @param response
+     */
+    public void removeRefreshTokenToCookie(HttpServletResponse response) {
+        this.setCookie(
+            response
+            , jwtConfig.refreshTokenCookieName()
+            , null
+            , 0
+            , jwtConfig.reissueUri()
+        );
+    }
+
+    public Optional<String> getRefreshTokenToCookie(HttpServletRequest request) {
+        return this.getCookie(request, jwtConfig.refreshTokenCookieName())
+            .map(Cookie::getValue);
+    }
+
+    /**
      * Request Header에서 특정 쿠키를 획득 (Optional 반환)
      * @param request 리퀘스트
      * @param name 찾고자하는 쿠키명

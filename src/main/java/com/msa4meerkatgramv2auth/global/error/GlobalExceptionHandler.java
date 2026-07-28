@@ -96,6 +96,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<GlobalResponseDTO<Void>> notFoundHandle(NoResourceFoundException e) {
+        log.debug(CustomResponseCode.NOT_FOUND_ERROR.name(), e);
         return this.generateErrorResponse(CustomResponseCode.NOT_FOUND_ERROR);
     }
 

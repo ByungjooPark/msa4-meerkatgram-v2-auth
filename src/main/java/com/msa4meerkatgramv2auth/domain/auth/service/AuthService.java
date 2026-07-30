@@ -5,7 +5,9 @@ import com.msa4meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.request.RegistrationRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.user.entity.User;
+import com.msa4meerkatgramv2auth.global.config.jpa.JPAWithDeleted;
 import com.msa4meerkatgramv2auth.global.cookie.CookieManager;
+import com.msa4meerkatgramv2auth.global.error.custom.DuplicatedRecordException;
 import com.msa4meerkatgramv2auth.global.error.custom.InvalidTokenException;
 import com.msa4meerkatgramv2auth.global.error.custom.NotRegisteredException;
 import com.msa4meerkatgramv2auth.global.jwt.JwtProvider;
@@ -93,8 +95,16 @@ public class AuthService {
         cookieManager.removeRefreshTokenToCookie(response);
     }
 
+    @JPAWithDeleted
     @Transactional(rollbackFor = Exception.class)
     public void registration(RegistrationRequestDTO registrationRequestDTO) {
+        // authRepository.findByEmail(registrationRequestDTO.email())
+        //     .ifPresent(user -> { throw new DuplicatedRecordException("이미 가입된 이메일 입니다."); });
+
+        if(authRepository.existsByEmail(registrationRequestDTO.email())) {
+            throw new DuplicatedRecordException("이미 가입된 이메일 입니다.");
+        }
+
         User user = new User();
         user.setEmail(registrationRequestDTO.email());
         user.setPassword(passwordEncoder.encode(registrationRequestDTO.password()));

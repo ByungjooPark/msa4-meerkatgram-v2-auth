@@ -1,7 +1,7 @@
 package com.msa4meerkatgramv2auth.global.jwt;
 
 import com.msa4meerkatgramv2auth.domain.user.entity.User;
-import com.msa4meerkatgramv2auth.global.error.custom.InvalidTokenException;
+import com.msa4meerkatgramv2auth.global.error.custom.business.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

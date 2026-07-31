@@ -1,6 +1,6 @@
 package com.msa4meerkatgramv2auth.global.minio;
 
-import com.msa4meerkatgramv2auth.global.error.custom.FileManagedException;
+import com.msa4meerkatgramv2auth.global.error.custom.business.FileManagedException;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;

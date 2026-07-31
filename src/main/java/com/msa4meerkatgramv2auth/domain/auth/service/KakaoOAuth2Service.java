@@ -79,6 +79,7 @@ public class KakaoOAuth2Service implements OAuth2UserService<OAuth2UserRequest, 
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setProvider(ProviderPolicy.KAKAO);
         user.setNick(nickname);
         user.setProfile(profile != null ? profile : "");
         return authRepository.save(user);

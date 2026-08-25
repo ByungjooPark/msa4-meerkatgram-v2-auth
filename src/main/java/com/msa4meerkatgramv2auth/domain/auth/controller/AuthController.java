@@ -5,6 +5,8 @@ import com.msa4meerkatgramv2auth.domain.auth.request.RegistrationRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.auth.service.AuthService;
 import com.msa4meerkatgramv2auth.global.config.openapi.CustomApiResponse;
+import com.msa4meerkatgramv2auth.global.cookie.CookieManager;
+import com.msa4meerkatgramv2auth.global.error.custom.business.InvalidTokenException;
 import com.msa4meerkatgramv2auth.global.response.GlobalResponseDTO;
 import com.msa4meerkatgramv2auth.global.response.constant.CustomResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final CookieManager cookieManager;
 
     @Operation(summary = "로그인 처리", description = "이메일과 비밀번호로 로그인")
     @SecurityRequirements
@@ -43,7 +46,11 @@ public class AuthController {
         @Valid @RequestBody LoginRequestDTO loginRequestDTO,
         HttpServletResponse response
     ) {
-        return ResponseEntity.ok(GlobalResponseDTO.success(authService.login(response, loginRequestDTO)));
+        AuthResponseDTO result = authService.login(loginRequestDTO);
+
+        cookieManager.setRefreshTokenToCookie(response, result.refreshToken());
+
+        return ResponseEntity.ok(GlobalResponseDTO.success(result));
     }
 
     @Operation(summary = "로그아웃 처리")
@@ -62,7 +69,10 @@ public class AuthController {
     ) {
         long userId = Long.parseLong(authentication.getName());
 
-        authService.logout(response, userId);
+        authService.logout(userId);
+
+        // Cookie에 저장한 리프래시토큰 파기
+        cookieManager.removeRefreshTokenToCookie(response);
 
         return ResponseEntity.ok(GlobalResponseDTO.success());
     }
@@ -79,7 +89,14 @@ public class AuthController {
         HttpServletRequest request,
         HttpServletResponse response
     ) {
-        return ResponseEntity.ok(GlobalResponseDTO.success(authService.reissue(request, response)));
+        // 쿠키 리프래시 토큰 획득
+        String refreshToken = cookieManager.getRefreshTokenToCookie(request)
+            .orElseThrow(() -> new InvalidTokenException("리프레시 토큰 없음"));
+
+        AuthResponseDTO result = authService.reissue(refreshToken);
+        cookieManager.setRefreshTokenToCookie(response, result.refreshToken());
+
+        return ResponseEntity.ok(GlobalResponseDTO.success(result));
     }
 
     @Operation(summary = "회원가입 처리")

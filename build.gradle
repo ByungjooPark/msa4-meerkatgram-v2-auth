@@ -21,7 +21,9 @@ repositories {
 dependencies {
     // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -63,6 +65,22 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+import java.nio.file.Files
+import java.nio.file.Paths
 tasks.named('test') {
     useJUnitPlatform()
+
+    // 테스트 실행 전 프로젝트 루트의 .env 파일을 읽어 System Property로 주입
+    def envFile = Paths.get(project.rootDir.absolutePath, '.env')
+    if (Files.exists(envFile)) {
+        Files.readAllLines(envFile).each { line ->
+            // 주석(#)이나 빈 줄 제외, 'KEY=VALUE' 형태만 파싱
+            if (line.trim() && !line.startsWith('#') && line.contains('=')) {
+                def (key, value) = line.split('=', 2).collect { it.trim() }
+                // 따옴표가 포함되어 있다면 제거
+                value = value.replaceAll(/^["']|["']$/, '')
+                systemProperty key, value
+            }
+        }
+    }
 }

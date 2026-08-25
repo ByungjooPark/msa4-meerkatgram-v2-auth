@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -75,6 +76,13 @@ public class GlobalExceptionHandler {
             ));
 
         log.debug("{}\n{}", CustomResponseCode.INVALID_PARAMETER_ERROR.name(), errors);
+        return this.generateErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
+    }
+
+    // RequestBody 자체가 없을 경우 에러
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GlobalResponseDTO<Void>> handle(HttpMessageNotReadableException e) {
+        log.debug(CustomResponseCode.INVALID_PARAMETER_ERROR.name(), e);
         return this.generateErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
     }
 

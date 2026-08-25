@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,9 +60,10 @@ public class KakaoOAuth2Service implements OAuth2UserService<OAuth2UserRequest, 
         }
 
         // 탈퇴한 유저일 경우 복구 처리
-        if(user.getDeletedAt() != null) {
-            user.setDeletedAt(null);
-            authRepository.save(user);
+        if(user.getIsWithdraw()) {
+            user.setIsWithdraw(false);
+            user.setWithdrawnAt(null);
+            user.setRestoredAt(LocalDateTime.now());
         }
 
         return new DefaultOAuth2User(

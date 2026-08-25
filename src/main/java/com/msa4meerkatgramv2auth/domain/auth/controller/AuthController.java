@@ -1,9 +1,8 @@
 package com.msa4meerkatgramv2auth.domain.auth.controller;
 
-import com.msa4meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
-import com.msa4meerkatgramv2auth.domain.auth.request.RegistrationRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.auth.service.AuthService;
+import com.msa4meerkatgramv2auth.domain.user.request.LoginRequestDTO;
 import com.msa4meerkatgramv2auth.global.config.openapi.CustomApiResponse;
 import com.msa4meerkatgramv2auth.global.cookie.CookieManager;
 import com.msa4meerkatgramv2auth.global.error.custom.business.InvalidTokenException;
@@ -99,18 +98,22 @@ public class AuthController {
         return ResponseEntity.ok(GlobalResponseDTO.success(result));
     }
 
-    @Operation(summary = "회원가입 처리")
+    @Operation(summary = "탈퇴 처리")
     @SecurityRequirements
     @CustomApiResponse(value = {
-        CustomResponseCode.INVALID_PARAMETER_ERROR,
+        CustomResponseCode.NOT_REGISTERED_ERROR,
+        CustomResponseCode.UNAUTHENTICATED_ERROR,
         CustomResponseCode.DB_ERROR,
         CustomResponseCode.SYSTEM_ERROR
     })
-    @PostMapping("/registration")
-    public ResponseEntity<GlobalResponseDTO<Void>> auth(
-        @Valid @RequestBody RegistrationRequestDTO registrationRequestDTO
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/withdraw")
+    public ResponseEntity<GlobalResponseDTO<Void>> withdraw (
+        HttpServletResponse response,
+        Authentication authentication
     ) {
-        authService.registration(registrationRequestDTO);
+        authService.withdraw(Long.parseLong(authentication.getName()));
+        cookieManager.removeRefreshTokenToCookie(response);
         return ResponseEntity.ok(GlobalResponseDTO.success());
     }
 }

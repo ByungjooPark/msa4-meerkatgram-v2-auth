@@ -1,8 +1,7 @@
-package com.msa4meerkatgramv2auth.domain.auth.request;
+package com.msa4meerkatgramv2auth.domain.user.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Schema(description = "로그인 시 필요 데이터")

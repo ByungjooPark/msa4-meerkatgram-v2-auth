@@ -1,7 +1,7 @@
 package com.msa4meerkatgramv2auth.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.msa4meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
+import com.msa4meerkatgramv2auth.domain.user.request.LoginRequestDTO;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.auth.service.AuthService;
 import com.msa4meerkatgramv2auth.domain.user.response.UserResponseDTO;

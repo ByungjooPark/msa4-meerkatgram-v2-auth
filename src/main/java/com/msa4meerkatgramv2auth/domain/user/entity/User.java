@@ -56,6 +56,15 @@ public class User {
     @Column(name = "refresh_token", nullable = true, length = 255)
     private String refreshToken;
 
+    @Column(name = "is_withdraw", nullable = true)
+    private Boolean isWithdraw = false;
+
+    @Column(name = "withdrawn_at", nullable = true)
+    private LocalDateTime withdrawnAt;
+
+    @Column(name = "restored_at", nullable = true)
+    private LocalDateTime restoredAt;
+
     @CreatedDate // 생성 시 자동으로 시간 입력
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -66,4 +75,5 @@ public class User {
 
     @Column(name = "deleted_at", nullable = true)
     private LocalDateTime deletedAt;
+
 }

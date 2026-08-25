@@ -73,6 +73,24 @@ spring:
             # 카카오 응답에서 사용자 식별을 위한 필드명
             user-name-attribute: id
 
+  # Kafka
+  kafka:
+    # 카프카 클러스터 접속 주소
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      # 메세지 키를 직렬화할 때 사용할 클래스
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 메세지 값을 직렬화 할 때 사용할 클래스
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # 직렬화 시 전송되는 Kafka 레코드 헤더에 DTO의 타입 정보(클래스 패키지 경로/식별자)를 포함할지 여부
+        spring.json.add.type.headers: true
+
+        # 헤더에 들어갈 타입 식별자와 실제 클래스 경로를 매핑
+        # (패키지 전체 경로 대신 'authWithdrawn'이라는 별칭을 헤더에 넣어 수신 측과의 패키지 불일치 문제를 방지)
+        spring.json.type.mapping: >-
+          authWithdrawn:com.msa4meerkatgramv2auth.domain.auth.event.AuthWithdrawEvent
+
 # Springdoc Openapi
 springdoc:
   default-consumes-media-type: application/json

@@ -1,5 +1,6 @@
 package com.msa4meerkatgramv2auth.domain.auth.service;
 
+import com.msa4meerkatgramv2auth.domain.auth.event.AuthWithdrawEvent;
 import com.msa4meerkatgramv2auth.domain.auth.repository.AuthRepository;
 import com.msa4meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
 import com.msa4meerkatgramv2auth.domain.user.entity.User;
@@ -8,6 +9,7 @@ import com.msa4meerkatgramv2auth.global.error.custom.business.InvalidTokenExcept
 import com.msa4meerkatgramv2auth.global.error.custom.business.NotRegisteredException;
 import com.msa4meerkatgramv2auth.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class AuthService {
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(rollbackFor = Exception.class)
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -98,5 +101,8 @@ public class AuthService {
 
         user.setIsWithdraw(true);
         user.setWithdrawnAt(LocalDateTime.now());
+
+        // kafka 이벤트 발행
+        applicationEventPublisher.publishEvent(new AuthWithdrawEvent(userId, user.getWithdrawnAt()));
     }
 }
